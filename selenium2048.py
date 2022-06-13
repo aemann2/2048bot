@@ -10,7 +10,6 @@ class GameBot:
     
     def __init__(self):
         self.high_score = 0
-        self.game_over = False
         # setting number of rounds to play via sysargs
         try:
             self.rounds = int(sys.argv[1])
@@ -39,31 +38,31 @@ class GameBot:
 
     def _check_for_game_over(self):
             self.driver.find_element(by=By.CLASS_NAME, value='game-over')
-            game_over = True
             # set high score to best score
             best_score_value = self.driver.find_element(by=By.CLASS_NAME, value='best-container')
             high_score = best_score_value.get_attribute('innerHTML')
             # restart round
             retry_button = self.driver.find_element(by=By.CLASS_NAME, value='retry-button')
             retry_button.click()
-            return game_over, high_score
+            return high_score
 
     def game_loop(self):
         if self.rounds:
             for i in range(self.rounds):
                 self._round_loop()
-                
+        # infinite game loop     
         else:
             for i in count(0):
                 self._round_loop()
     
     def _round_loop(self):
-        self.game_over = False
+        round_over = False
         self._start_round()
-        while self.game_over == False:
+        while round_over == False:
             self._key_press_loop_circular()
             try: 
-                self.game_over, self.high_score = self._check_for_game_over()
+                self.high_score = self._check_for_game_over()
+                round_over = True
             except:
                 continue
         self.roundsCompleted += 1
