@@ -11,28 +11,31 @@ class GameBot:
     def __init__(self):
         self.high_score = 0
         self.game_over = False
+        # setting number of rounds to play via sysargs
         try:
             self.rounds = int(sys.argv[1])
         except:
             self.rounds = None
         self.driver = webdriver.Chrome()
-        self.roundsCompleted = 0
+        # initializing the selenium driver
         self.driver.get('https://play2048.co/')
+        self.roundsCompleted = 0
+        self.keys = [Keys.ARROW_RIGHT, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_UP]
         self.container = self.driver.find_element(by=By.TAG_NAME, value='html')
 
     def _start_round(self):
         start = self.driver.find_element(by=By.CLASS_NAME, value='restart-button')
         start.click()
     
-    def _key_press_loop(self):
-        self.container.send_keys(Keys.ARROW_RIGHT)
-        # sleep(.1)
-        self.container.send_keys(Keys.ARROW_DOWN)
-        # sleep(.1)
-        self.container.send_keys(Keys.ARROW_LEFT)
-        # sleep(.1)
-        self.container.send_keys(Keys.ARROW_UP)
-        # sleep(.1)
+    def _key_press_loop_random(self):
+        i = random.randrange(0, 4)
+        self.container.send_keys(self.keys[i])
+        sleep(.1)
+
+    def _key_press_loop_circular(self):
+        for i in range(0, 4):
+            self.container.send_keys(self.keys[i])
+            sleep(.1)
 
     def _check_for_game_over(self):
             self.driver.find_element(by=By.CLASS_NAME, value='game-over')
@@ -58,15 +61,17 @@ class GameBot:
         self.game_over = False
         self._start_round()
         while self.game_over == False:
-            # TODO: randomize key entries
-            self._key_press_loop()
+            self._key_press_loop_circular()
             try: 
                 self.game_over, self.high_score = self._check_for_game_over()
             except:
                 continue
         self.roundsCompleted += 1
 
-game_bot = GameBot()
-game_bot.game_loop()
+    def end_message(self):
+        print(f'Best high score over {self.roundsCompleted} rounds: {self.high_score}')
 
-print(f'Best high score over {game_bot.roundsCompleted} rounds: {game_bot.high_score}')
+game_bot = GameBot()
+
+game_bot.game_loop()
+game_bot.end_message()
