@@ -47,13 +47,16 @@ class GameBot:
             return high_score
 
     def game_loop(self):
-        if self.rounds:
-            for i in range(self.rounds):
-                self._round_loop()
-        # infinite game loop     
-        else:
-            for i in count(0):
-                self._round_loop()
+        try:
+            if self.rounds:
+                for i in range(self.rounds):
+                    self._round_loop()
+            # infinite game loop     
+            else:
+                for i in count(0):
+                    self._round_loop()
+        except KeyboardInterrupt:
+            print('Game stopped!')
     
     def _round_loop(self):
         round_over = False
@@ -68,7 +71,10 @@ class GameBot:
         self.roundsCompleted += 1
 
     def end_message(self):
-        print(f'Best high score over {self.roundsCompleted} rounds: {self.high_score}')
+        if not self.roundsCompleted:
+            print('Game stopped too early to capture stats')
+        else:
+            print(f'Best high score over {self.roundsCompleted} rounds: {self.high_score}')
 
 game_bot = GameBot()
 
