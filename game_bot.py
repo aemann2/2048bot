@@ -77,7 +77,6 @@ class GameBot:
         if not self.roundsCompleted:
             print('Game stopped too early to capture stats')
         else:
-            print(self.high_scores)
             print(
 f"""Best high score over {self.roundsCompleted} rounds: {self.high_scores[-1]} 
 Average score per round: {round(sum(self.high_scores) / self.roundsCompleted)}""")
