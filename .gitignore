@@ -1,4 +1,4 @@
 .env 
 .venv
 venv
-gecokdriver.log
+geckodriver.log
