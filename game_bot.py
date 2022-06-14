@@ -1,10 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import WebDriverException
 from time import sleep
 import sys
 from itertools import count
 import random
+import inquirer
 
 class GameBot:
     
@@ -15,10 +17,11 @@ class GameBot:
             self.rounds = int(sys.argv[1])
         except:
             self.rounds = None
+        self.game_speed = self._speed_prompt()
         self.driver = webdriver.Chrome()
         # initializing the selenium driver
         self.driver.get('https://play2048.co/')
-        self.roundsCompleted = 0
+        self.rounds_completed = 0
         self.keys = [Keys.ARROW_RIGHT, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_UP]
         self.container = self.driver.find_element(by=By.TAG_NAME, value='html')
 
@@ -29,12 +32,12 @@ class GameBot:
     def _key_press_loop_random(self):
         i = random.randrange(0, 4)
         self.container.send_keys(self.keys[i])
-        sleep(.1)
+        sleep(self.game_speed)
 
     def _key_press_loop_circular(self):
         for i in range(0, 4):
             self.container.send_keys(self.keys[i])
-            sleep(.1)
+            # sleep(self.game_speed)
 
     def _check_for_game_over(self):
             self.driver.find_element(by=By.CLASS_NAME, value='game-over')
@@ -59,6 +62,19 @@ class GameBot:
         except KeyboardInterrupt:
             self.driver.quit()
             print('Game stopped!')
+
+    def _speed_prompt(self):
+        speed_choices = ['Fast', 'Medium', 'Slow']
+        sleep_times = [.1, .3, .5]
+        questions = [
+            inquirer.List('speed',
+                message="Choose a speed for the bot:",
+                choices=speed_choices,
+            )]
+        answer = inquirer.prompt(questions)
+        idx = speed_choices.index(answer['speed'])
+        game_speed = sleep_times[idx]
+        return game_speed
     
     def _round_loop(self):
         round_over = False
@@ -71,12 +87,12 @@ class GameBot:
                 self.high_scores.append(int(high_score))
             except:
                 continue
-        self.roundsCompleted += 1
+        self.rounds_completed += 1
 
     def end_message(self):
-        if not self.roundsCompleted:
+        if not self.rounds_completed:
             print('Game stopped too early to capture stats')
         else:
             print(
-f"""Best high score over {self.roundsCompleted} rounds: {self.high_scores[-1]} 
-Average score per round: {round(sum(self.high_scores) / self.roundsCompleted)}""")
+f"""Best high score over {self.rounds_completed} rounds: {self.high_scores[-1]} 
+Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}""")
