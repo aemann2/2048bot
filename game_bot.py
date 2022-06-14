@@ -25,30 +25,6 @@ class GameBot:
         self.keys = [Keys.ARROW_RIGHT, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_UP]
         self.container = self.driver.find_element(by=By.TAG_NAME, value='html')
 
-    def _start_round(self):
-        start = self.driver.find_element(by=By.CLASS_NAME, value='restart-button')
-        start.click()
-    
-    def _key_press_loop_random(self):
-        i = random.randrange(0, 4)
-        self.container.send_keys(self.keys[i])
-        sleep(self.game_speed)
-
-    def _key_press_loop_circular(self):
-        for i in range(0, 4):
-            self.container.send_keys(self.keys[i])
-            # sleep(self.game_speed)
-
-    def _check_for_game_over(self):
-            self.driver.find_element(by=By.CLASS_NAME, value='game-over')
-            # set high score to best score
-            best_score_value = self.driver.find_element(by=By.CLASS_NAME, value='best-container')
-            high_score = best_score_value.get_attribute('innerHTML')
-            # restart round
-            retry_button = self.driver.find_element(by=By.CLASS_NAME, value='retry-button')
-            retry_button.click()
-            return high_score
-
     def game_loop(self):
         try:
             if self.rounds:
@@ -63,6 +39,52 @@ class GameBot:
             self.driver.quit()
             print('Game stopped!')
 
+    def end_message(self):
+        if not self.rounds_completed:
+            print('Game stopped too early to capture stats')
+        else:
+            print(
+f"""Best high score over {self.rounds_completed} rounds: {self.high_scores[-1]} 
+Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}""")
+
+    def _round_loop(self):
+        round_over = False
+        self._start_round()
+        while round_over == False:
+            self._key_press_loop_random()
+            # if _check_for_game_over throws an error, it's because the game is still going, so we'd except and continue the loop
+            try: 
+                high_score = self._check_for_game_over()
+                self.high_scores.append(int(high_score))
+                round_over = True
+            except:
+                continue
+        self.rounds_completed += 1
+
+    def _start_round(self):
+        start = self.driver.find_element(by=By.CLASS_NAME, value='restart-button')
+        start.click()
+    
+    def _key_press_loop_random(self):
+        i = random.randrange(0, 4)
+        self.container.send_keys(self.keys[i])
+        sleep(self.game_speed)
+
+    def _key_press_loop_circular(self):
+        for i in range(0, 4):
+            self.container.send_keys(self.keys[i])
+            sleep(self.game_speed)
+
+    def _check_for_game_over(self):
+            self.driver.find_element(by=By.CLASS_NAME, value='game-over')
+            # set high score to best score
+            best_score_value = self.driver.find_element(by=By.CLASS_NAME, value='best-container')
+            high_score = best_score_value.get_attribute('innerHTML')
+            # restart round
+            retry_button = self.driver.find_element(by=By.CLASS_NAME, value='retry-button')
+            retry_button.click()
+            return high_score
+
     def _speed_prompt(self):
         speed_choices = ['Fast', 'Medium', 'Slow']
         sleep_times = [.1, .3, .5]
@@ -75,24 +97,3 @@ class GameBot:
         idx = speed_choices.index(answer['speed'])
         game_speed = sleep_times[idx]
         return game_speed
-    
-    def _round_loop(self):
-        round_over = False
-        self._start_round()
-        while round_over == False:
-            self._key_press_loop_circular()
-            try: 
-                high_score = self._check_for_game_over()
-                round_over = True
-                self.high_scores.append(int(high_score))
-            except:
-                continue
-        self.rounds_completed += 1
-
-    def end_message(self):
-        if not self.rounds_completed:
-            print('Game stopped too early to capture stats')
-        else:
-            print(
-f"""Best high score over {self.rounds_completed} rounds: {self.high_scores[-1]} 
-Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}""")
