@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
 from time import sleep
 import sys
 from itertools import count
@@ -15,6 +14,9 @@ class GameBot:
         # setting number of rounds to play via sysargs
         try:
             self.rounds = int(sys.argv[1])
+        except ValueError:
+            print('Round values must be a number.')
+            sys.exit()
         except:
             self.rounds = None
         self.game_speed = self._speed_prompt()
@@ -35,7 +37,7 @@ class GameBot:
                 for i in count(0):
                     self._round_loop()
             self.driver.quit()
-        except KeyboardInterrupt:
+        except:
             self.driver.quit()
             print('Game stopped!')
 
