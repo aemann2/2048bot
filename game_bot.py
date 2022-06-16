@@ -7,8 +7,9 @@ from itertools import count
 import random
 import inquirer
 
+
 class GameBot:
-    
+
     def __init__(self):
         self.high_scores = []
         # setting number of rounds to play via sysargs
@@ -17,7 +18,8 @@ class GameBot:
         except ValueError:
             print('Round values must be a number.')
             sys.exit()
-        except:
+        except Exception as e:
+            print(f"Error: {e}")
             self.rounds = None
         self.game_speed = self._speed_prompt()
         self.driver = webdriver.Chrome()
@@ -34,10 +36,11 @@ class GameBot:
                     self._round_loop()
             # infinite game loop     
             else:
-                for i in count(0):
+                for _ in count(0):
                     self._round_loop()
             self.driver.quit()
-        except:
+        except Exception as e:
+            print(f"Error: {e}")
             self.driver.quit()
             print('Game stopped!')
 
@@ -46,27 +49,28 @@ class GameBot:
             print('Game stopped too early to capture stats')
         else:
             print(
-f"""Best high score over {self.rounds_completed} rounds: {self.high_scores[-1]} 
+                f"""Best high score over {self.rounds_completed} rounds: {self.high_scores[-1]} 
 Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}""")
 
     def _round_loop(self):
         round_over = False
         self._start_round()
-        while round_over == False:
+        while not round_over:
             self._key_press_loop_random()
             # if _check_for_game_over throws an error, it's because the game is still going, so we'd except and continue the loop
-            try: 
+            try:
                 high_score = self._check_for_game_over()
                 self.high_scores.append(int(high_score))
                 round_over = True
-            except:
+            except Exception as e:
+                print(f"Error: {e}")
                 continue
         self.rounds_completed += 1
 
     def _start_round(self):
         start = self.driver.find_element(by=By.CLASS_NAME, value='restart-button')
         start.click()
-    
+
     def _key_press_loop_random(self):
         i = random.randrange(0, 4)
         self.container.send_keys(self.keys[i])
@@ -78,23 +82,24 @@ Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}"
             sleep(self.game_speed)
 
     def _check_for_game_over(self):
-            self.driver.find_element(by=By.CLASS_NAME, value='game-over')
-            # set high score to best score
-            best_score_value = self.driver.find_element(by=By.CLASS_NAME, value='best-container')
-            high_score = best_score_value.get_attribute('innerHTML')
-            # restart round
-            retry_button = self.driver.find_element(by=By.CLASS_NAME, value='retry-button')
-            retry_button.click()
-            return high_score
+        self.driver.find_element(by=By.CLASS_NAME, value='game-over')
+        # set high score to best score
+        best_score_value = self.driver.find_element(by=By.CLASS_NAME, value='best-container')
+        high_score = best_score_value.get_attribute('innerHTML')
+        # restart round
+        retry_button = self.driver.find_element(by=By.CLASS_NAME, value='retry-button')
+        retry_button.click()
+        return high_score
 
-    def _speed_prompt(self):
+    @staticmethod
+    def _speed_prompt():
         speed_choices = ['Fast', 'Medium', 'Slow']
         sleep_times = [.1, .3, .5]
         questions = [
             inquirer.List('speed',
-                message="Choose a speed for the bot:",
-                choices=speed_choices,
-            )]
+                          message="Choose a speed for the bot:",
+                          choices=speed_choices,
+                          )]
         answer = inquirer.prompt(questions)
         idx = speed_choices.index(answer['speed'])
         game_speed = sleep_times[idx]
