@@ -13,6 +13,6 @@ This is a Selenium bot for Python that plays [2048](https://play2048.co/). Idea 
 
 **Notes**: 
 - The 2048 website is a bit janky, and the ads on the page sometimes cause the browser to crash. If that happens, you may have to restart the program.
-- This project was create on OSX Monterey 12.3.1. YMMV on other operating systems.
+- This project was created on OSX Monterey 12.3.1. YMMV on other operating systems.
 
 https://user-images.githubusercontent.com/68879246/173965718-1d006ff9-69aa-4e94-8729-e8646d28c60f.mov
