@@ -9,7 +9,7 @@ This is a Selenium bot for Python that plays [2048](https://play2048.co/). Idea 
 - Activate env: `source venv/bin/activate`
 - Install dependencies in requirements.txt w/ `pip install -r requirements.txt`
 - Follow instructions for installing Chromedrive for Chrome: https://chromedriver.chromium.org/getting-started
-- Run project w/ `python selenium2048.py`
+- Run project w/ `python selenium2048.py` (will run infinitely). To run for a specific number of rounds, enter a number after the run command -e.g., `python selenium2048.py 4`
 
 **Notes**: 
 - The 2048 website is a bit janky, and the ads on the page sometimes cause the browser to crash. If that happens, you may have to restart the program.
