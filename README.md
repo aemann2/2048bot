@@ -1,6 +1,6 @@
 # 2048 Bot
 
-This is a Selenium bot that plays [2048](https://play2048.co/). Idea taken from [this chapter](https://automatetheboringstuff.com/2e/chapter12/) of Automate the Boring Stuff.
+This is a Selenium bot for Python that plays [2048](https://play2048.co/). Idea taken from [this chapter](https://automatetheboringstuff.com/2e/chapter12/) of Automate the Boring Stuff.
 
 
 ## Installation instructions:
