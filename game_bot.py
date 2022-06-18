@@ -18,8 +18,7 @@ class GameBot:
         except ValueError:
             print('Round values must be a number.')
             sys.exit()
-        except Exception as e:
-            print(f"Error: {e}")
+        except:
             self.rounds = None
         self.game_speed = self._speed_prompt()
         self.driver = webdriver.Chrome()
@@ -32,15 +31,14 @@ class GameBot:
     def game_loop(self):
         try:
             if self.rounds:
-                for i in range(self.rounds):
+                for _ in range(self.rounds):
                     self._round_loop()
             # infinite game loop     
             else:
                 for _ in count(0):
                     self._round_loop()
             self.driver.quit()
-        except Exception as e:
-            print(f"Error: {e}")
+        except:
             self.driver.quit()
             print('Game stopped!')
 
@@ -50,7 +48,7 @@ class GameBot:
         else:
             print(
                 f"""Best high score over {self.rounds_completed} rounds: {self.high_scores[-1]} 
-Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}""")
+                Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}""")
 
     def _round_loop(self):
         round_over = False
@@ -62,8 +60,7 @@ Average score per round: {round(sum(self.high_scores) / self.rounds_completed)}"
                 high_score = self._check_for_game_over()
                 self.high_scores.append(int(high_score))
                 round_over = True
-            except Exception as e:
-                print(f"Error: {e}")
+            except:
                 continue
         self.rounds_completed += 1
 
